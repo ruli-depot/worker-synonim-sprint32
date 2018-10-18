@@ -75,9 +75,14 @@ func main() {
 func generateDictionaryMap() {
 	for _, val := range dictionary["data"] {
 		for _, data := range val.DataList {
+			data = strings.Trim(data, " ")
 			dictionaryMap[data] = true
 		}
 	}
+
+	// for _,val := range dictionaryMap {
+	// 	log.Println("word :",val)
+	// }
 
 }
 
@@ -105,9 +110,10 @@ func generateResult() {
 		if err == io.EOF {
 			break
 		}
-		fullWord := strings.Join(row, " ")
+
+		arrRow := strings.Fields(row[0])
 		isSynonimAvailable := "0"
-		for _, word := range row {
+		for _, word := range arrRow {
 			if dictionaryMap[word] {
 				isSynonimAvailable = "1"
 				break
@@ -115,7 +121,7 @@ func generateResult() {
 		}
 
 		// log.Println(fullWord)
-		err = writerCSV.Write([]string{fullWord, isSynonimAvailable})
+		err = writerCSV.Write([]string{row[0], isSynonimAvailable})
 		if err != nil {
 			panic(err)
 		}
