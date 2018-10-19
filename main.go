@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -103,6 +104,12 @@ func generateResult() {
 	if err != nil {
 		panic(err)
 	}
+	// Make a Regex to say we only want
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		panic(err)
+	}
+	log.Println(reg)
 
 	reader := csv.NewReader(bufio.NewReader(file))
 	for {
@@ -111,9 +118,15 @@ func generateResult() {
 			break
 		}
 
-		arrRow := strings.Fields(row[0])
+		// fullWord := reg.ReplaceAllString(row[1], "")
+		fullWord := strings.Replace(row[1], ";", "", -1)
+		arrRow := strings.Fields(fullWord)
+
 		isSynonimAvailable := "0"
 		for _, word := range arrRow {
+			// if len(word) < 2 {
+			// 	log.Println(arrRow)
+			// }
 			if dictionaryMap[word] {
 				isSynonimAvailable = "1"
 				break
@@ -121,7 +134,7 @@ func generateResult() {
 		}
 
 		// log.Println(fullWord)
-		err = writerCSV.Write([]string{row[0], isSynonimAvailable})
+		err = writerCSV.Write([]string{fullWord, isSynonimAvailable})
 		if err != nil {
 			panic(err)
 		}
